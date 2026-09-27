@@ -48,6 +48,10 @@ bld/
 [Ll]ogs/
 
 # Build results on 'Bin' directories
+
+# Local appsettings files that may contain secrets
+**/appsettings.Local.json
+**/appsettings.*.Local.json
 **/[Bb]in/*
 # Uncomment if you have tasks that rely on *.refresh files to move binaries
 # (https://github.com/github/gitignore/pull/3736)
@@ -427,3 +431,4 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+/FinancialAPI/appsettings.Development.json
