@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using FinancialAPI.Models;
+using System.Text.RegularExpressions;
 
 namespace FinancialAPI.Data
 {
@@ -42,6 +43,20 @@ namespace FinancialAPI.Data
             modelBuilder.Entity<Category>().HasKey(c => c.Id);
             modelBuilder.Entity<Subcategory>().HasKey(s => s.Id);
             modelBuilder.Entity<ContextEntity>().HasKey(c => c.Id);
+
+            // Explicit snake_case column mappings for all entity properties
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                foreach (var property in entityType.GetProperties())
+                {
+                    property.SetColumnName(ToSnakeCase(property.Name));
+                }
+            }
+        }
+
+        private static string ToSnakeCase(string value)
+        {
+            return Regex.Replace(value, "([a-z0-9])([A-Z])", "$1_$2").ToLowerInvariant();
         }
     }
 }

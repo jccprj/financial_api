@@ -11,6 +11,6 @@ namespace FinancialAPI.Models
         public bool Active { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
-        public string? ApiToken { get; set; }
+        //public string? ApiToken { get; set; }
     }
 }

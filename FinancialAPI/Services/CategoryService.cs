@@ -22,12 +22,20 @@ namespace FinancialAPI.Services
             return null;
         }
 
+        private async Task<IEnumerable<Category>> ListBasicAsync()
+        {
+            return await _db.Categories.Where(c => c.UserId == null && c.Active).ToListAsync();
+        }
+
         public async Task<IEnumerable<CategoryDto>> ListAsync(ClaimsPrincipal user)
         {
             var userId = GetUserId(user);
             if (userId == null) return Enumerable.Empty<CategoryDto>();
 
-            var items = await _db.Categories.Where(c => c.UserId == userId.Value && c.Active).ToListAsync();
+            var basicItems = await ListBasicAsync();
+            var customItems = await _db.Categories.Where(c => c.UserId == userId.Value && c.Active).ToListAsync();
+
+            var items = (basicItems).Concat(customItems);
             return items.Select(c => new CategoryDto(c.Id, c.Name));
         }
 
@@ -36,7 +44,7 @@ namespace FinancialAPI.Services
             var userId = GetUserId(user);
             if (userId == null) return null;
 
-            var item = await _db.Categories.FirstOrDefaultAsync(c => c.Id == id && c.UserId == userId.Value);
+            var item = await _db.Categories.FirstOrDefaultAsync(c => c.Id == id && (c.UserId == null || c.UserId == userId.Value));
             if (item == null) return null;
             return new CategoryDto(item.Id, item.Name);
         }

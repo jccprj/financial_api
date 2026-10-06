@@ -1,5 +1,6 @@
 using FinancialAPI.Data;
 using FinancialAPI.Services;
+using FinancialAPI.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
@@ -10,6 +11,16 @@ builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, relo
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    options.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
+
+    // Add JWT Bearer security to Swagger
+    options.AddSwaggerJwtSecurity();
+});
 
 // Configuration for JWT
 var jwtSection = builder.Configuration.GetSection("Jwt");
@@ -57,6 +68,12 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Financial API v1");
+        options.RoutePrefix = "swagger";
+    });
 }
 
 app.UseAuthentication();

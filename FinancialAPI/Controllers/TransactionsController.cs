@@ -17,7 +17,12 @@ namespace FinancialAPI.Controllers
             _svc = svc;
         }
 
+        /// <summary>
+        /// Lista transações com filtros opcionais.
+        /// </summary>
         [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<TransactionDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> List([FromQuery] DateTime? dateFrom, [FromQuery] DateTime? dateTo, [FromQuery] decimal? minAmount, [FromQuery] decimal? maxAmount, [FromQuery] ulong? merchantId, [FromQuery] ulong? categoryId, [FromQuery] string? status)
         {
             var filters = new TransactionFilterParams(dateFrom, dateTo, minAmount, maxAmount, merchantId, categoryId, status);
@@ -25,14 +30,25 @@ namespace FinancialAPI.Controllers
             return Ok(items);
         }
 
+        /// <summary>
+        /// Lista transações pendentes de classificação.
+        /// </summary>
         [HttpGet("pending-classifications")]
+        [ProducesResponseType(typeof(IEnumerable<TransactionDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Pending()
         {
             var items = await _svc.ListPendingClassificationsAsync(User);
             return Ok(items);
         }
 
+        /// <summary>
+        /// Obtém uma transação por identificador.
+        /// </summary>
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(TransactionDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Get(ulong id)
         {
             var item = await _svc.GetAsync(User, id);
@@ -40,7 +56,13 @@ namespace FinancialAPI.Controllers
             return Ok(item);
         }
 
+        /// <summary>
+        /// Classifica manualmente uma transação.
+        /// </summary>
         [HttpPut("{id}/classify")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Classify(ulong id, [FromBody] ClassifyTransactionDto dto)
         {
             var ok = await _svc.ClassifyAsync(User, id, dto);

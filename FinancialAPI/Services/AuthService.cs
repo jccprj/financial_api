@@ -29,10 +29,10 @@ namespace FinancialAPI.Services
             if (user == null) return null;
 
             // Accept if api token matches or password hash is not set (simple fallback for seed)
-            if (!string.IsNullOrEmpty(request.ApiToken) && request.ApiToken == user.ApiToken)
-            {
-                return GenerateToken(user);
-            }
+            //if (!string.IsNullOrEmpty(request.ApiToken) && request.ApiToken == user.ApiToken)
+            //{
+            //    return GenerateToken(user);
+            //}
 
             if (string.IsNullOrEmpty(user.PasswordHash))
             {
@@ -72,7 +72,7 @@ namespace FinancialAPI.Services
                 issuer: _issuer,
                 audience: null,
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(8),
+                expires: DateTime.UtcNow.AddHours(1),
                 signingCredentials: creds);
 
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
